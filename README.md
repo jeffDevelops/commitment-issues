@@ -8,7 +8,7 @@ Front-end state will be managed by React and Redux. The user's commits will be p
 
 ## Wireframes
 
-[Main Screen Wireframes](/meta-assets/wireframes/main_screen.png)
+![Main Screen Wireframes](/meta-assets/wireframes/main_screen.png)
 
 ## Stretch Goals
 
