@@ -8,7 +8,11 @@ Front-end state will be managed by React and Redux. The user's commits will be p
 
 ## Wireframes
 
-[Main Screen Wireframes](/meta-assets/wireframes/main_screen.png)
+![Main Screen Wireframes](/meta-assets/wireframes/main_screen.png)
+
+## User Stories
+
+My User Stories are public on Trello here: https://trello.com/b/em6gR5fb/commitment-issues
 
 ## Stretch Goals
 
@@ -17,3 +21,6 @@ React Native implementation
 Tracking commits to repositories that are not the user's own
 
 In addition to listing the user's commits, listing all contributors' pushes to the given repository, and update every time the API call is made.
+
+## Contribute to this Project: Developer Installation Instructions
+
