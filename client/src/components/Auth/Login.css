@@ -1,0 +1,53 @@
+h3 {
+	font-weight: 400;
+}
+
+button {
+	position: relative;
+	width: 100%;
+	padding: 25px 25px 25px 60px;
+	font-family: 'Work Sans', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+	text-transform: uppercase;
+	font-weight: 600;
+	letter-spacing: .1em;
+	background: white;
+	border: 2px solid #000;
+	border-radius: 5px;
+	transition: color .5s, background .5s;
+}
+
+button:hover {
+	color: #fff;
+	background: #000;
+	transition: all .6s;
+}
+
+button:hover i.devicon-github-plain.colored,
+button:hover i.material-icons.logout {
+	color: #fff;
+	transition: color .6s;
+}	
+
+button:focus, 
+button:active {
+	outline: none;
+}
+
+button i.devicon-github-plain.colored {
+	position: absolute;
+	top: 14px;
+	left: 15px;
+	font-size: 3em;
+	margin-right: 20px;
+	color: #000;
+	transition: color .6s;
+}
+
+button i.material-icons.logout {
+	position: absolute;
+	top: 14px;
+	left: 40px;
+	font-size: 3em;
+	color: #000;
+	transition: color .6s;
+}
