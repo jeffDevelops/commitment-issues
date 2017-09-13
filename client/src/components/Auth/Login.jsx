@@ -16,6 +16,8 @@ firebase.initializeApp(config);
 var provider = new firebase.auth.GithubAuthProvider();
 provider.addScope('repo');
 
+
+
 class Login extends Component {
 
 	constructor(props) {
@@ -24,6 +26,7 @@ class Login extends Component {
 			user: '',
 			fetchingUser: false
 		}
+		this.authenticate = this.authenticate.bind(this);
 		this.logout = this.logout.bind(this);
 	}
 
@@ -33,6 +36,10 @@ class Login extends Component {
 			var token = result.credential.accessToken;
 			//The signed-in user info
 			var user = result.user;
+			this.setState({
+				fetchingUser: true,
+				user: user
+			});
 		}).catch(function(error) {
 			var errorCode = error.code;
 			var errorMessage = error.message;
@@ -56,19 +63,15 @@ class Login extends Component {
 		})
 	}
 
-	componentWillMount() {
+	componentDidMount() {	
 		this.setState({
-			fetchingUser: true
-		})
-	}
-
-	componentDidMount() {
+			fetchingUser: false
+		});
 		firebase.auth().onAuthStateChanged( user => {
 			if (user) {
 				console.log(user);
 				this.setState({
 					user: user.displayName,
-					fetchingUser: false
 				})
 			}
 			else {
