@@ -88,8 +88,11 @@ class Login extends Component {
 			var credential = error.credential;
 		}).then( () => {
 			console.log(token);
+			window.sessionStorage.setItem('ghAccessToken', token);
+			let storedToken = window.sessionStorage.getItem('ghAccessToken');
+			console.log(storedToken);
 			this.setState({
-				token: token
+				token: storedToken
 			});
 		});
 	}
@@ -140,8 +143,11 @@ class Login extends Component {
 				console.log('No user is signed in.');
 			}
 		});
-		
+		let savedToken = window.sessionStorage.getItem('ghAccessToken');
+		this.getUserRepositories(savedToken);
 	}
+
+	
 
 	render() {
 		console.log("--------------RENDER TRIGGERED---------------");
