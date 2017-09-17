@@ -4,7 +4,8 @@ body {
 }
 
 .page_container {
-	width: 224px;
+	min-width: 224px;
+	width: 80%;
 	margin: 50px auto;
 }
 

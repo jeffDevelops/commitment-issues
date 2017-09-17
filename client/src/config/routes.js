@@ -12,6 +12,6 @@ export default (
 	<Route path="/" component={ App } >
 		<Route path="/login" component={ Login } />
 		<Route path="/repositories" component={ RepositoryIndex } />
-		<Route path="/tracker" component={ Tracker } />
+		<Route path="/tracker/:repo" component={ Tracker } />
 	</Route>
 )
