@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router';
 
 import Brand from '../Brand/Brand.jsx';
 
@@ -14,5 +15,3 @@ class App extends Component {
 }
 
 export default App;
-
-
