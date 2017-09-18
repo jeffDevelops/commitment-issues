@@ -9,7 +9,7 @@ class Tracker extends Component {
 		super(props);
 			firebase.auth().onAuthStateChanged( (user) => {
 			if (!user) {
-				window.location = '/login';
+				window.location = '/';
 			} else {
 				console.log('Signed In');
 				this.user = user;
@@ -25,6 +25,7 @@ class Tracker extends Component {
 			rerenders: 0,
 			interval: 4,
 			unit: 'hour',
+			tracking: false,
 
 			hourInterval: null,
 			demoInterval: null,
@@ -45,24 +46,28 @@ class Tracker extends Component {
 			if (index === unitsArray.length - 1) {
 				console.log('re-render triggered here');
 				this.setState({
-					unit: unitsArray[0]
+					unit: unitsArray[0],
+					tracking: false
 				});
 			} else {
 				console.log('re-render triggered here');
 				this.setState({
-					unit: unitsArray[index + 1]
+					unit: unitsArray[index + 1],
+					tracking: false
 				});
 			}
 		} else {
 			console.log('re-render triggered here');
 			if (index === 0) {
 				this.setState({
-					unit: unitsArray[unitsArray.length - 1]
+					unit: unitsArray[unitsArray.length - 1],
+					tracking: false
 				})
 			} else {
 				console.log('re-render triggered here');
 				this.setState({
-					unit: unitsArray[index - 1]
+					unit: unitsArray[index - 1],
+					tracking: false
 				})
 			}
 		}
@@ -141,34 +146,11 @@ class Tracker extends Component {
 				});
 				console.log('DEMO ran');
 			}, 15000);
-			this.setState({ demoInterval: demoInterval });
+			this.setState({ 
+				demoInterval: demoInterval,
+				tracking: true
+			});
 		}
-	}
-
-	componentWillUnmount() {
-		window.clearInterval(this.state.hourInterval);
-		window.clearInterval(this.state.demoInterval);
-		window.clearInterval(this.state.workdayInterval);
-		//window.clearInterval(this.state.halfdayInterval);
-	}
-
-	componentDidMount() {
-
-		let token = window.sessionStorage.getItem('ghAccessToken');
-		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
-		
-		console.log(URL);
-		axios({
-			method: 'get',
-			url: URL
-		}).then( (response) => {
-			console.log(response.data);
-			this.setState({
-				mostRecentCommit: response.data[0].sha
-			})
-		});
-
-		this.state.rerenders += 1;
 
 		//HOUR CONDITION
 		if (this.state.unit === 'hour') {
@@ -187,27 +169,62 @@ class Tracker extends Component {
 				});
 			console.log('hour ran');
 			}, interval);
-			this.setState({ hourInterval: hourInterval });
+			this.setState({ 
+				hourInterval: hourInterval,
+				tracking: true
+			 });
 		}
 		
 		//HALFDAY CONDITION
 		if (this.state.unit === 'half-day') {
+			console.log('HALFDAY');
 			//make API calls at 11:55am and 4:55pm
+			this.setState({
+				tracking: true
+			});
 		}
 		if (this.state.unit === 'workday') {
+			console.log('WORKDAY!');
 			let workday = 28800000;
 			let interval = workday / this.state.interval;
 			var workdayInterval = window.setInterval( () => {
 				console.log('workday ran');
-			// 	axios({
-			// 		method: 'get',
-			// 		url: URL
-			// 	}).then( (response) => {
-			// 		console.log(response.data);
-			// 	})
+				axios({
+					method: 'get',
+					url: URL
+				}).then( (response) => {
+					console.log(response.data);
+				})
 			}, interval);
-			this.setState({ workdayInterval: workdayInterval });
+			this.setState({ 
+				workdayInterval: workdayInterval,
+				tracking: true
+			});
 		}
+	}
+
+	componentWillUnmount() {
+		window.clearInterval(this.state.hourInterval);
+		window.clearInterval(this.state.demoInterval);
+		window.clearInterval(this.state.workdayInterval);
+		//window.clearInterval(this.state.halfdayInterval);
+	}
+
+	componentDidMount() {
+		let token = window.sessionStorage.getItem('ghAccessToken');
+		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
+		
+		console.log(URL);
+		axios({
+			method: 'get',
+			url: URL
+		}).then( (response) => {
+			console.log(response.data);
+			this.setState({
+				mostRecentCommit: response.data[0].sha
+			})
+		});
+		this.state.rerenders += 1;
 	}
 
 	render() {
@@ -263,10 +280,17 @@ class Tracker extends Component {
 						}
 						</div>
 					<h1 className="slash">/</h1>
-					<button  
-						className="track_button"
-						onClick={this.runTimer}
-					><i className="material-icons logout">track_changes</i>Track Backups</button>
+
+					{ !this.state.tracking 
+						? <div className="track_button">
+								<button  
+									onClick={this.runTimer}
+								><i className="material-icons logout">track_changes</i>Track Backups
+								</button> 
+							</div>
+						: <div className="track_button"><i className="material-icons logout">track_changes</i><h4>Tracking Changes</h4></div>
+					}
+
 					<div className="unit_container">
 						<button 
 						onClick={ () => { this.changeUnit('increment') }}
