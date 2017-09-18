@@ -25,3 +25,5 @@ In addition to listing the user's commits, listing all contributors' pushes to t
 ## Contribute to this Project: Developer Installation Instructions
 Fork and clone this repo. Run `npm install`. `cd` into the client folder. Run `npm start`.
 
+## Major Hurdles
+* this.setState() is NOT recommended within the render() method
