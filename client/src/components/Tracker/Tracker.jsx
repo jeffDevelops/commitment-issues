@@ -145,8 +145,11 @@ class Tracker extends Component {
 		}
 	}
 
-	componentWillMount() {
-
+	componentWillUnmount() {
+		window.clearInterval(this.state.hourInterval);
+		window.clearInterval(this.state.demoInterval);
+		window.clearInterval(this.state.workdayInterval);
+		//window.clearInterval(this.state.halfdayInterval);
 	}
 
 	componentDidMount() {
