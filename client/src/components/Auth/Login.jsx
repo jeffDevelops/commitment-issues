@@ -120,7 +120,7 @@ class Login extends Component {
 				this.setState({
 					user: user.displayName
 				})
-				if (this.state.token) {
+				if (this.token) {
 					this.getUserRepositories(this.state.token);
 				}
 			}

@@ -7,31 +7,38 @@ import './Tracker.css';
 class Tracker extends Component {
 	constructor(props) {
 		super(props);
-		user: null;
-		firebase.auth().onAuthStateChanged( (user) => {
+			firebase.auth().onAuthStateChanged( (user) => {
 			if (!user) {
 				window.location = '/login';
 			} else {
 				console.log('Signed In');
 				this.user = user;
-				console.log('re-render triggered here.');
-				this.setState({
-					user: user.displayName
-				});
 			}
 		});
 		this.changeUnit = this.changeUnit.bind(this);
 		this.changeInterval = this.changeInterval.bind(this);
+		this.runTimer = this.runTimer.bind(this);
 		this.state = {
 			repo: this.props.params.repo,
 			owner: this.props.params.owner,
 			mostRecentCommit: null, 
+			rerenders: 0,
 			interval: 4,
-			unit: 'hour'
+			unit: 'hour',
+
+			hourInterval: null,
+			demoInterval: null,
+			workdayInterval: null,
+			//halfdayInterval: null
 		}
 	}
 
 	changeUnit(upOrDown) {
+		window.clearInterval(this.state.hourInterval);
+		window.clearInterval(this.state.demoInterval);
+		window.clearInterval(this.state.workdayInterval);
+		//window.clearInterval(this.state.halfdayInterval);
+
 		let unitsArray = ['hour', 'half-day', 'workday', '[DEMO]'];
 		let index = unitsArray.indexOf(this.state.unit);
 		if (upOrDown === 'increment') {
@@ -62,6 +69,11 @@ class Tracker extends Component {
 	}
 
 	changeInterval(upOrDown) {
+		window.clearInterval(this.state.hourInterval);
+		window.clearInterval(this.state.demoInterval);
+		window.clearInterval(this.state.workdayInterval);
+		//window.clearInterval(this.state.halfdayInterval);
+
 		let intervalsArray = [];
 		let intervalValue;
 		let index;
@@ -102,9 +114,46 @@ class Tracker extends Component {
 		}
 	}
 
-	componentDidMount() {
+	runTimer() {
 		let token = window.sessionStorage.getItem('ghAccessToken');
 		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
+		if (this.state.unit === '[DEMO]') {
+			//DEMO CONDITION
+			console.log('DEMO!');
+			var demoInterval = window.setInterval( () => {
+				axios({
+					method: 'get',
+					url: URL
+				}).then( (response) => {
+					console.log(response.data);
+					if (response.data[0].sha === this.state.mostRecentCommit) { //user fails if previous API call comes back with same array
+						this.setState({
+							result: 'fail',
+							rerenders: 2
+						})
+					} else { //if they pass, also update the state of the most recent commit, so that can be checked next
+						this.setState({
+							rerenders: 2,
+							mostRecentCommit: response.data[0].sha,
+							result: 'pass'
+						});
+					}
+				});
+				console.log('DEMO ran');
+			}, 15000);
+			this.setState({ demoInterval: demoInterval });
+		}
+	}
+
+	componentWillMount() {
+
+	}
+
+	componentDidMount() {
+
+		let token = window.sessionStorage.getItem('ghAccessToken');
+		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
+		
 		console.log(URL);
 		axios({
 			method: 'get',
@@ -115,27 +164,15 @@ class Tracker extends Component {
 				mostRecentCommit: response.data[0].sha
 			})
 		});
-	}
 
+		this.state.rerenders += 1;
 
-	componentDidUpdate() {
-
-	}
-
-	render() {
-		console.log('----------RENDER----------');
-		console.log(this.state);
-
-		let token = window.sessionStorage.getItem('ghAccessToken');
-		console.log(token);
-		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
-		console.log(URL);
 		//HOUR CONDITION
 		if (this.state.unit === 'hour') {
 			let hour = 3600000;
 			let interval = hour / this.state.interval;
 			console.log(interval);
-			window.setInterval( () => {
+			var hourInterval = window.setInterval( () => {
 				axios({
 					method: 'get',
 					url: URL
@@ -147,29 +184,9 @@ class Tracker extends Component {
 				});
 			console.log('hour ran');
 			}, interval);
+			this.setState({ hourInterval: hourInterval });
 		}
-		//DEMO CONDITION
-		if (this.state.unit === '[DEMO]') {
-			window.setInterval( () => {
-				axios({
-					method: 'get',
-					url: URL
-				}).then( (response) => {
-					console.log(response.data);
-					if (response.data[0].sha == this.state.mostRecentCommit) { //user fails if previous API call comes back with same array
-						this.setState({
-							result: 'fail'
-						})
-					} else { //if they pass, also update the state of the most recent commit, so that can be checked next
-						this.setState({
-							mostRecentCommit: response.data[0].sha,
-							result: 'pass'
-						});
-					}
-				});
-				console.log('DEMO ran');
-			}, 15000);
-		}
+		
 		//HALFDAY CONDITION
 		if (this.state.unit === 'half-day') {
 			//make API calls at 11:55am and 4:55pm
@@ -177,7 +194,7 @@ class Tracker extends Component {
 		if (this.state.unit === 'workday') {
 			let workday = 28800000;
 			let interval = workday / this.state.interval;
-			window.setInterval( () => {
+			var workdayInterval = window.setInterval( () => {
 				console.log('workday ran');
 			// 	axios({
 			// 		method: 'get',
@@ -186,11 +203,31 @@ class Tracker extends Component {
 			// 		console.log(response.data);
 			// 	})
 			}, interval);
+			this.setState({ workdayInterval: workdayInterval });
 		}
+	}
+
+	render() {
+		console.log('----------RENDER----------');
+		console.log(this.state);
 
 		return (
 			<div>
-				<Link to='/login' className="back_button"><i className="material-icons back">chevron_left</i></Link>
+
+				{/* RESULTS */}
+
+				{this.state.mostRecentCommit && this.state.rerenders > 1 &&
+				<div className="result_message"> 
+					{this.state.result === 'fail'
+					? <p className="fail_message red">This is a friendly reminder to commit and push!</p>
+					: <p className="pass_message green">Great job! Backed-up code does a happy dev make!</p>
+					}
+				</div>
+				}
+
+				{/* UI */}
+
+				<Link to='/' className="back_button"><i className="material-icons back">chevron_left</i></Link>
 				<h3 className="repo">You are tracking the <b>{this.state.repo}</b> repository.</h3>
 				<div className="tracker">
 					<h2>Goal Interval</h2>
@@ -223,6 +260,10 @@ class Tracker extends Component {
 						}
 						</div>
 					<h1 className="slash">/</h1>
+					<button  
+						className="track_button"
+						onClick={this.runTimer}
+					><i className="material-icons logout">track_changes</i>Track Backups</button>
 					<div className="unit_container">
 						<button 
 						onClick={ () => { this.changeUnit('increment') }}
@@ -244,7 +285,7 @@ class Tracker extends Component {
 						: null
 						}
 						{ this.state.unit === '[DEMO]'
-						? <p className="unit_description">This setting demonstrates the functionality of the app by checking whether you've committed and pushed every 30 seconds.
+						? <p className="unit_description">This setting demonstrates the functionality of the app by checking whether you've committed and pushed every 15 seconds.
 							</p>
 						: null
 						}
