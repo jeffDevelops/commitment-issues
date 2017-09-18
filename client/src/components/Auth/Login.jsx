@@ -1,24 +1,13 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import * as axios from 'axios';
+import * as firebase from 'firebase';
+import { provider, config } from '../../config/auth.js';
 
 import './Login.css';
 import RepositoryDetail from '../Repository_Detail/RepositoryDetail.jsx';
 
-//Firebase Auth (does it belong in this file? NO. It needs to be moved to the parent component.)
-import * as firebase from 'firebase';
 
-const config = {
-	apiKey: "AIzaSyDCb2eE8cg75fMQxcQNuI8c-X4zS6DAbA4",
-  authDomain: "commitment-issues.firebaseapp.com",
-  databaseURL: "https://commitment-issues.firebaseio.com",
-  projectId: "commitment-issues",
-  storageBucket: "commitment-issues.appspot.com",
-  messagingSenderId: "479646167912"
-};
-firebase.initializeApp(config);
-var provider = new firebase.auth.GithubAuthProvider();
-provider.addScope('repo');
 
 function RepoIndex(props) {
 	console.log(props.repos);
@@ -28,7 +17,7 @@ function RepoIndex(props) {
 			<ul className="repos_list">
 				{ props.repos.map(function(repo, index) {
 					return (
-					 	<Link to={`/tracker/${repo.name}`} className="link" key={repo.name}
+					 	<Link to={`/tracker/${repo.name}/${repo.owner.login}`} className="link" key={repo.name}
 					 		onClick={ ((event) => { 
 					 			// event.preventDefault();
 					 			saveToDatabase(repo.name, event) 
@@ -62,12 +51,10 @@ class Login extends Component {
 		this.getUserRepositories = this.getUserRepositories.bind(this);
 		this.authenticate = this.authenticate.bind(this);
 		this.logout = this.logout.bind(this);
-		this.state = {}
-		// this.state = {
-		// 	user: null,
-		// 	repositories: null,
-		// 	token: null
-		// }
+		// this.token = null;
+		this.state = {
+			token: null
+		};
 	}
 
 
@@ -91,9 +78,7 @@ class Login extends Component {
 			window.sessionStorage.setItem('ghAccessToken', token);
 			let storedToken = window.sessionStorage.getItem('ghAccessToken');
 			console.log(storedToken);
-			this.setState({
-				token: storedToken
-			});
+			this.state.token = storedToken
 		});
 	}
 

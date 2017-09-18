@@ -133,7 +133,7 @@ ul li img {
 	width: 15%;
 	min-width: 75px;
 	padding: 3%;
-	border-radius: 15%;
+	border-radius: 20%;
 	border: 1px solid transparent;
 	transition: transform .3s ease;
 }
