@@ -23,4 +23,7 @@ Tracking commits to repositories that are not the user's own
 In addition to listing the user's commits, listing all contributors' pushes to the given repository, and update every time the API call is made.
 
 ## Contribute to this Project: Developer Installation Instructions
+Fork and clone this repo. Run `npm install`. `cd` into the client folder. Run `npm start`.
 
+## Major Hurdles
+* this.setState() is NOT recommended within the render() method
