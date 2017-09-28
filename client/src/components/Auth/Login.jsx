@@ -18,9 +18,9 @@ function RepoIndex(props) {
 				{ props.repos.map(function(repo, index) {
 					return (
 					 	<Link to={`/tracker/${repo.name}/${repo.owner.login}`} className="link" key={repo.name}
-					 		onClick={ ((event) => { 
+					 		onClick={ ((event) => {
 					 			// event.preventDefault();
-					 			saveToDatabase(repo.name, event) 
+					 			saveToDatabase(repo.name, event)
 					 		})}>
 						 	<li className="repo_detail">
 						 		<div className="info_container">
@@ -132,24 +132,24 @@ class Login extends Component {
 		this.getUserRepositories(savedToken);
 	}
 
-	
+
 
 	render() {
 		console.log("--------------RENDER TRIGGERED---------------");
 		console.log('--------------STATE: ', this.state);
 		return (
 			<div>
-				{ this.state.user 
-					? 
+				{ this.state.user
+					?
 					<div>
-						<h2>Hello, {this.state.user}!</h2> 
+						<h2>Hello, {this.state.user}!</h2>
 						<button onClick= { this.logout }><i className="material-icons logout">undo</i>Log out</button>
 						{ this.state.repositories
 						? <RepoIndex repos={this.state.repositories} />
 						: <div></div>
 						}
 					</div>
-					: 
+					:
 					<div>
 						<h3 className="login_message">You must be logged into your GitHub profile to use this app.</h3>
 						<button onClick={ this.authenticate }><i className="devicon-github-plain colored"></i>Log In With GitHub</button>

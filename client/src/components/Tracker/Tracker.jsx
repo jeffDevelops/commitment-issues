@@ -4,6 +4,32 @@ import * as firebase from 'firebase';
 import * as axios from 'axios';
 import './Tracker.css';
 
+import successSound from '../../media/success.mp3';
+import reminderSound from '../../media/reminder.mp3';
+
+function Results (props) {
+	console.log(props.result);
+	//Fail
+	switch (props.result) {
+		case 'fail':
+			return (
+				<div className="result_message">
+					<audio src={reminderSound} />
+					<p className="message red"><i className="material-icons">error_outline</i>This is a friendly reminder to commit and push!</p>
+				</div>
+			);
+			break;
+		case 'pass':
+			return (
+				<div className="result_message">
+					<audio src={successSound} />
+					<p className="message green"><i className="material-icons">check_circle</i>Great job! Backed-up code does a happy dev make!</p>
+				</div>
+			);
+			break;
+	}
+}
+
 class Tracker extends Component {
 	constructor(props) {
 		super(props);
@@ -15,17 +41,22 @@ class Tracker extends Component {
 				this.user = user;
 			}
 		});
+
+		//Bind 'this' to the component class in method scopes
 		this.changeUnit = this.changeUnit.bind(this);
 		this.changeInterval = this.changeInterval.bind(this);
 		this.runTimer = this.runTimer.bind(this);
+		this.clearResultMessage = this.clearResultMessage.bind(this);
+
 		this.state = {
 			repo: this.props.params.repo,
 			owner: this.props.params.owner,
-			mostRecentCommit: null, 
+			mostRecentCommit: null,
 			rerenders: 0,
 			interval: 4,
 			unit: 'hour',
 			tracking: false,
+			result: 'waiting',
 
 			hourInterval: null,
 			demoInterval: null,
@@ -40,7 +71,7 @@ class Tracker extends Component {
 		window.clearInterval(this.state.workdayInterval);
 		//window.clearInterval(this.state.halfdayInterval);
 
-		let unitsArray = ['hour', 'half-day', 'workday', '[DEMO]'];
+		let unitsArray = ['hour', 'half-day', 'workday', 'Try It!'];
 		let index = unitsArray.indexOf(this.state.unit);
 		if (upOrDown === 'increment') {
 			if (index === unitsArray.length - 1) {
@@ -88,10 +119,11 @@ class Tracker extends Component {
 				intervalsArray.push(intervalValue);
 			}
 			index = intervalsArray.indexOf(this.state.interval);
-		} else if (this.state.unit === 'half-day' || this.state.unit === '[DEMO]') {
+		} else if (this.state.unit === 'half-day' || this.state.unit === 'Try It!') {
 			console.log('re-render triggered here.');
-			this.setState( {
-				interval: 1
+			this.setState({
+				interval: 1,
+				tracking: false
 			});
 		} else if (this.state.unit === 'workday') {
 			console.log('workday');
@@ -106,14 +138,16 @@ class Tracker extends Component {
 			if (index !== intervalsArray.length - 1) {
 				console.log('re-render triggered here.');
 				this.setState({
-					interval: intervalsArray[index + 1]
+					interval: intervalsArray[index + 1],
+					tracking: false
 				})
 			}
 		} else {
 			if (index !== 0) {
 				console.log('re-render triggered here.');
 				this.setState({
-					interval: intervalsArray[index - 1]
+					interval: intervalsArray[index - 1],
+					tracking: false
 				})
 			}
 		}
@@ -122,8 +156,9 @@ class Tracker extends Component {
 	runTimer() {
 		let token = window.sessionStorage.getItem('ghAccessToken');
 		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
-		if (this.state.unit === '[DEMO]') {
-			//DEMO CONDITION
+
+		//DEMO CONDITION
+		if (this.state.unit === 'Try It!') {
 			console.log('DEMO!');
 			var demoInterval = window.setInterval( () => {
 				axios({
@@ -146,7 +181,7 @@ class Tracker extends Component {
 				});
 				console.log('DEMO ran');
 			}, 15000);
-			this.setState({ 
+			this.setState({
 				demoInterval: demoInterval,
 				tracking: true
 			});
@@ -169,12 +204,12 @@ class Tracker extends Component {
 				});
 			console.log('hour ran');
 			}, interval);
-			this.setState({ 
+			this.setState({
 				hourInterval: hourInterval,
 				tracking: true
 			 });
 		}
-		
+
 		//HALFDAY CONDITION
 		if (this.state.unit === 'half-day') {
 			console.log('HALFDAY');
@@ -196,11 +231,23 @@ class Tracker extends Component {
 					console.log(response.data);
 				})
 			}, interval);
-			this.setState({ 
+			this.setState({
 				workdayInterval: workdayInterval,
 				tracking: true
 			});
 		}
+	}
+
+	clearResultMessage() { //Wait five seconds, and then clear the result message
+		console.log('Is clear function running?');
+		window.setTimeout( () => {
+			console.log("Is this happening?");
+			this.setState({ result: 'waiting' });
+		}, 5000);
+	}
+
+	componentWillMount() {
+
 	}
 
 	componentWillUnmount() {
@@ -213,7 +260,7 @@ class Tracker extends Component {
 	componentDidMount() {
 		let token = window.sessionStorage.getItem('ghAccessToken');
 		let URL = `https://api.github.com/repos/${this.state.owner}/${this.state.repo}/commits?access_token=${token}`;
-		
+
 		console.log(URL);
 		axios({
 			method: 'get',
@@ -231,18 +278,28 @@ class Tracker extends Component {
 		console.log('----------RENDER----------');
 		console.log(this.state);
 
+		if (this.state.tracking && this.state.result !== 'waiting') {
+			console.log(this.clearResultMessage);
+			this.clearResultMessage(); //This is reeeeally bad practice... a state change exists in this function; definitely open to suggestions on how to implement this better.
+		}
+
 		return (
 			<div>
 
 				{/* RESULTS */}
 
-				{this.state.mostRecentCommit && this.state.rerenders > 1 &&
-				<div className="result_message"> 
-					{this.state.result === 'fail'
-					? <p className="fail_message red">This is a friendly reminder to commit and push!</p>
-					: <p className="pass_message green">Great job! Backed-up code does a happy dev make!</p>
-					}
-				</div>
+				{ this.state.mostRecentCommit && this.state.rerenders > 1 &&
+					<div>
+						{ this.state.result === 'fail' &&
+							<Results result="fail" />
+						}
+						{ this.state.result === 'pass' &&
+							<Results result="pass" />
+						}
+						{ this.state.result === 'waiting' &&
+							<div />
+						}
+					</div>
 				}
 
 				{/* UI */}
@@ -252,14 +309,14 @@ class Tracker extends Component {
 				<div className="tracker">
 					<h2>Goal Interval</h2>
 					<div className="interval_container">
-						{ this.state.unit === 'half-day' || this.state.unit === '[DEMO]'
+						{ this.state.unit === 'half-day' || this.state.unit === 'Try It!'
 							? <div>
 									<button
 									className="override">
 									<i className="disabled material-icons arrow_buttons">arrow_drop_up</i>
 									</button>
 									<h3 className="interval_value">1</h3>
-									<button 
+									<button
 										className="override">
 										<i className=" disabled material-icons arrow_buttons down interval_value_down">arrow_drop_down</i>
 									</button>
@@ -271,7 +328,7 @@ class Tracker extends Component {
 										<i className="material-icons arrow_buttons">arrow_drop_up</i>
 									</button>
 									<h3 className="interval_value">{this.state.interval}</h3>
-									<button 
+									<button
 									onClick={ () => { this.changeInterval('decrement') }}
 									className="override">
 									<i className="material-icons arrow_buttons down interval_value_down">arrow_drop_down</i>
@@ -279,43 +336,46 @@ class Tracker extends Component {
 								</div>
 						}
 						</div>
+
 					<h1 className="slash">/</h1>
 
-					{ !this.state.tracking 
+					{ !this.state.tracking
 						? <div className="track_button">
-								<button  
+								<button
 									onClick={this.runTimer}
 								><i className="material-icons logout">track_changes</i>Track Backups
-								</button> 
+								</button>
 							</div>
-						: <div className="track_button"><i className="material-icons logout">track_changes</i><h4>Tracking Changes</h4></div>
+						: <div className="track_button tracking">
+								<i className="material-icons logout">track_changes</i><h4>Listening<br />For Backups</h4>
+							</div>
 					}
 
 					<div className="unit_container">
-						<button 
+						<button
 						onClick={ () => { this.changeUnit('increment') }}
 						className="override"><i className="material-icons arrow_buttons up unit_value_up">arrow_drop_up</i></button>
 						<h3 className="unit_value">{this.state.unit}</h3>
-						<button 
+						<button
 						onClick={ () => {this.changeUnit('decrement') }}
 						className="override">
-						<i className="material-icons arrow_buttons down unit_value_down">arrow_drop_down</i>
-						</button>
 						{ this.state.unit === 'workday'
-						? <p className="unit_description">This setting will remind you to commit and push however many times you want within a 8-hour period.
+						? <p className="unit_description">8-hour workday
 							</p>
 						: null
 						}
 						{ this.state.unit === 'half-day'
-						? <p className="unit_description">This setting will remind you to commit and push before lunch and before 5 o'clock.
+						? <p className="unit_description">Before noon and 5 o'clock
 							</p>
 						: null
 						}
-						{ this.state.unit === '[DEMO]'
-						? <p className="unit_description">This setting demonstrates the functionality of the app by checking whether you've committed and pushed every 15 seconds.
+						{ this.state.unit === 'Try It!'
+						? <p className="unit_description">Every 15 seconds
 							</p>
 						: null
 						}
+						<i className="material-icons arrow_buttons down unit_value_down">arrow_drop_down</i>
+						</button>
 					</div>
 				</div>
 				<div className="results">
