@@ -122,8 +122,10 @@ class Login extends Component {
 				this.setState({
 					user: user.displayName
 				})
-				if (this.token) {
+				if (this.state.token) {
 					this.getUserRepositories(this.state.token);
+				} else {
+					this.setState({ askForTokenPermission: true});
 				}
 			}
 			else {
@@ -157,6 +159,15 @@ class Login extends Component {
 					:	<div className="login_prompt">
 							{ this.state.fetchingUser &&
 								<h2 className="loading">Fetching your repositories</h2>
+							}
+							{ this.state.askForTokenPermission && this.state.user &&
+								<div className="authPrompt">
+									<h2>The use of this app requires read-only permissions to access your GitHub repositories. Authorize Commitment Issues to check when you have backed up your work?</h2>
+									<button
+										onClick = { this.authenticate }>
+										Authorize
+									</button>
+								</div>
 							}
 							<h3 className="login_message">You must be logged into your GitHub profile to use this app.</h3>
 							<button onClick={ this.authenticate }><i className="devicon-github-plain colored"></i>Log In With GitHub</button>
