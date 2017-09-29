@@ -1,3 +1,49 @@
+.auth_prompt {
+	position: absolute;
+	z-index: 5;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	background: #000;
+}
+
+.auth_group {
+	position: absolute;
+	width: 60%;
+	margin: auto;
+	top: 35vh;
+	left: 0; right: 0;
+	color: #fff;
+}
+
+.authorize_text {
+	text-align: left;
+}
+
+.auth_prompt button {
+	position: relative;
+	border-color: #fff;
+	background: transparent;
+	color: #fff;
+}
+
+.auth_prompt button:hover {
+	background: #fff;
+	color: #000;
+}
+
+.auth_prompt button:hover i {
+	color: #000;
+}
+
+.auth_prompt button i {
+	position: absolute;
+	color: #fff;
+	top: 30%;
+	left: 20%;
+}
+
 .login_section {
 	height: auto;
 	width: 100%;

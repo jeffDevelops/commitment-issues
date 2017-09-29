@@ -58,6 +58,7 @@ class Login extends Component {
 
 	authenticate() {
 		let token;
+		console.log("setState");
 		this.setState({ fetchingUser: true });
 		firebase.auth().signInWithPopup(provider).then(function(result) {
 			//This gives you access to a GitHub Access Token, which is used to access the Github API
@@ -77,9 +78,12 @@ class Login extends Component {
 			window.sessionStorage.setItem('ghAccessToken', token);
 			let storedToken = window.sessionStorage.getItem('ghAccessToken');
 			console.log(storedToken);
+			console.log("setState");
+			this.getUserRepositories(storedToken);
 			this.setState({
 				token: storedToken,
-				fetchingUser: false
+				fetchingUser: false,
+				askForTokenPermission: false
 			});
 		});
 	}
@@ -94,6 +98,7 @@ class Login extends Component {
 			url: URL,
 			responseType: 'json'
 		}).then( (response) => { //Render results
+			console.log("setState");
 			this.setState({
 				repositories: response.data
 			});
@@ -108,6 +113,7 @@ class Login extends Component {
 		}).catch( (error) => {
 			console.log('An error occurred.', error);
 		});
+		console.log("setState");
 		this.setState({
 			user: ''
 		});
@@ -119,13 +125,20 @@ class Login extends Component {
 				console.log('SIGNED IN: ' + user.displayName);
 				console.log(user);
 				console.log(this);
-				this.setState({
-					user: user.displayName
-				})
 				if (this.state.token) {
+					console.log("API function called");
 					this.getUserRepositories(this.state.token);
+					console.log("setState");
+					this.setState({
+						askForTokenPermission: false,
+					 	user: user.displayName
+					});
 				} else {
-					this.setState({ askForTokenPermission: true});
+					console.log("setState");
+					this.setState({
+						askForTokenPermission: true,
+						user: user.displayName
+					});
 				}
 			}
 			else {
@@ -133,13 +146,13 @@ class Login extends Component {
 			}
 		});
 		let savedToken = window.sessionStorage.getItem('ghAccessToken');
+		console.log("API function called");
 		this.getUserRepositories(savedToken);
+		console.log("setState");
+		this.setState({ token: savedToken })
 	}
 
-
-
 	render() {
-		console.log("--------------RENDER TRIGGERED---------------");
 		console.log('--------------STATE: ', this.state);
 		return (
 			<div>
@@ -160,23 +173,24 @@ class Login extends Component {
 							{ this.state.fetchingUser &&
 								<h2 className="loading">Fetching your repositories</h2>
 							}
-							{ this.state.askForTokenPermission && this.state.user &&
-								<div className="authPrompt">
-									<h2>The use of this app requires read-only permissions to access your GitHub repositories. Authorize Commitment Issues to check when you have backed up your work?</h2>
-									<button
-										onClick = { this.authenticate }>
-										Authorize
-									</button>
-								</div>
-							}
 							<h3 className="login_message">You must be logged into your GitHub profile to use this app.</h3>
 							<button onClick={ this.authenticate }><i className="devicon-github-plain colored"></i>Log In With GitHub</button>
 						</div>
 				}
+				{ this.state.askForTokenPermission && this.state.user && !this.state.fetchingUser &&
+					<div className="auth_prompt">
+						<div className="auth_group">
+							<h2 className="authorize_text">The use of this app requires read-only permissions to access your GitHub repositories. Authorize the app to check when you have backed up your work?</h2>
+							<button
+								onClick = { this.authenticate }><i className="material-icons">verified_user</i>
+								Authorize
+							</button>
+						</div>
+					</div>
+				}
 			</div>
 		)
 	} //render
-
 }
 
 export default Login;
