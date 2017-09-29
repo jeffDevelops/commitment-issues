@@ -1,5 +1,8 @@
 # Commitment Issues
 
+Check out the app:
+http://commitmentissues.surge.sh/
+
 Commitment Issues is a companion app to GitHub that instills healthy version control habits by tracking whether developers have pushed to their remote repository within user-specified intervals. Let's say you want to shoot for 4 commits an hour. Every quarter of an hour, the app checks whether a push has been made by that user to that repository.
 
 ## Technologies Proposal
