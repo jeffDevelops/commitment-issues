@@ -72,7 +72,7 @@ class Tracker extends Component {
 		window.clearInterval(this.state.workdayInterval);
 		//window.clearInterval(this.state.halfdayInterval);
 
-		let unitsArray = ['hour', 'half-day', 'workday', 'Try It!'];
+		let unitsArray = ['hour', 'workday', 'Try It!'];
 		let index = unitsArray.indexOf(this.state.unit);
 		if (upOrDown === 'increment') {
 			if (index === unitsArray.length - 1) {
@@ -181,7 +181,7 @@ class Tracker extends Component {
 					}
 				});
 				console.log('DEMO ran');
-			}, 6000);
+			}, 60000);
 			this.setState({
 				demoInterval: demoInterval,
 				tracking: true
@@ -202,23 +202,36 @@ class Tracker extends Component {
 					this.setState({
 						mostRecentCommit: response.data[0]
 					});
-				});
-			console.log('hour ran');
-			}, interval);
-			this.setState({
-				hourInterval: hourInterval,
-				tracking: true
-			 });
-		}
-
-		//HALFDAY CONDITION
-		if (this.state.unit === 'half-day') {
-			console.log('HALFDAY');
-			//make API calls at 11:55am and 4:55pm
-			this.setState({
-				tracking: true
+					if (response.data[0].sha === this.state.mostRecentCommit) { //user fails if previous API call comes back with same array
+						this.setState({
+							result: 'fail',
+							rerenders: 2
+						})
+					} else { //if they pass, also update the state of the most recent commit, so that can be checked next
+						this.setState({
+							rerenders: 2,
+							mostRecentCommit: response.data[0].sha,
+							result: 'pass'
+						});
+					}
+					this.setState({
+						hourInterval: hourInterval,
+						tracking: true
+					 });
+				}, interval);
 			});
 		}
+
+		// //HALFDAY CONDITION
+		// if (this.state.unit === 'half-day') {
+		// 	console.log('HALFDAY');
+		// 	//make API calls at 11:55am and 4:55pm
+		// 	this.setState({
+		// 		tracking: true
+		// 	});
+		// }
+
+		//WORKDAY CONDITION
 		if (this.state.unit === 'workday') {
 			console.log('WORKDAY!');
 			let workday = 28800000;
@@ -230,7 +243,19 @@ class Tracker extends Component {
 					url: URL
 				}).then( (response) => {
 					console.log(response.data);
-				})
+					if (response.data[0].sha === this.state.mostRecentCommit) { //user fails if previous API call comes back with same array
+						this.setState({
+							result: 'fail',
+							rerenders: 2
+						})
+					} else { //if they pass, also update the state of the most recent commit, so that can be checked next
+						this.setState({
+							rerenders: 2,
+							mostRecentCommit: response.data[0].sha,
+							result: 'pass'
+						});
+					}
+				});
 			}, interval);
 			this.setState({
 				workdayInterval: workdayInterval,
