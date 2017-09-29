@@ -2,11 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import * as axios from 'axios';
 import * as firebase from 'firebase';
-import { provider, config } from '../../config/auth.js';
-
+import { provider } from '../../config/auth.js';
 import './Login.css';
-import RepositoryDetail from '../Repository_Detail/RepositoryDetail.jsx';
-
 
 
 function RepoIndex(props) {
@@ -67,14 +64,14 @@ class Login extends Component {
 			token = result.credential.accessToken;
 			console.log(token);
 			//The signed-in user info
-			var user = result.user;
+			// var user = result.user;
 		}).catch(function(error) {
-			var errorCode = error.code;
-			var errorMessage = error.message;
+			// var errorCode = error.code;
+			// var errorMessage = error.message;
 			//The email of the user's account used
-			var email = error.email;
+			// var email = error.email;
 			//The firebase.auth.AuthCredential type that was used (Github)
-			var credential = error.credential;
+			// var credential = error.credential;
 		}).then( () => {
 			console.log(token);
 			window.sessionStorage.setItem('ghAccessToken', token);
@@ -163,6 +160,6 @@ class Login extends Component {
 		)
 	} //render
 
-} {/*component class*/}
+} 
 
 export default Login;

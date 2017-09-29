@@ -19,7 +19,6 @@ function Results (props) {
 					<p className="message red"><i className="material-icons">error_outline</i>This is a friendly reminder to commit and push!</p>
 				</div>
 			);
-			break;
 		case 'pass':
 			return (
 				<div className="result_message">
@@ -27,7 +26,10 @@ function Results (props) {
 					<p className="message green"><i className="material-icons">check_circle</i>Great job! Backed-up code does a happy dev make!</p>
 				</div>
 			);
-			break;
+		default:
+			return (
+				<h2>Network connectivity error.</h2>
+			)
 	}
 }
 
@@ -214,11 +216,11 @@ class Tracker extends Component {
 							result: 'pass'
 						});
 					}
-					this.setState({
-						hourInterval: hourInterval,
-						tracking: true
-					 });
-				}, interval);
+				});
+			}, interval);
+			this.setState({
+				hourInterval: hourInterval,
+				tracking: true
 			});
 		}
 
