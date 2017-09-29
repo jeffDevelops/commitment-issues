@@ -56,7 +56,6 @@ class Login extends Component {
 		};
 	}
 
-
 	authenticate() {
 		let token;
 		firebase.auth().signInWithPopup(provider).then(function(result) {
@@ -107,7 +106,7 @@ class Login extends Component {
 		});
 		this.setState({
 			user: ''
-		})
+		});
 	}
 
 	componentDidMount() {
@@ -160,6 +159,6 @@ class Login extends Component {
 		)
 	} //render
 
-} 
+}
 
 export default Login;
