@@ -52,12 +52,13 @@ class Login extends Component {
 		this.logout = this.logout.bind(this);
 		// this.token = null;
 		this.state = {
-			token: null
+			token: null,
 		};
 	}
 
 	authenticate() {
 		let token;
+		this.setState({ fetchingUser: true });
 		firebase.auth().signInWithPopup(provider).then(function(result) {
 			//This gives you access to a GitHub Access Token, which is used to access the Github API
 			token = result.credential.accessToken;
@@ -76,7 +77,10 @@ class Login extends Component {
 			window.sessionStorage.setItem('ghAccessToken', token);
 			let storedToken = window.sessionStorage.getItem('ghAccessToken');
 			console.log(storedToken);
-			this.state.token = storedToken
+			this.setState({
+				token: storedToken,
+				fetchingUser: false
+			});
 		});
 	}
 
@@ -137,7 +141,7 @@ class Login extends Component {
 		console.log('--------------STATE: ', this.state);
 		return (
 			<div>
-				{ this.state.user
+				{ this.state.user && !this.state.fetchingUser
 					? <div>
 							<div className="login_section">
 								<h2>Hello, {this.state.user}!</h2>
@@ -151,6 +155,9 @@ class Login extends Component {
 							</div>
 						</div>
 					:	<div className="login_prompt">
+							{ this.state.fetchingUser &&
+								<h2 className="loading">Fetching your repositories</h2>
+							}
 							<h3 className="login_message">You must be logged into your GitHub profile to use this app.</h3>
 							<button onClick={ this.authenticate }><i className="devicon-github-plain colored"></i>Log In With GitHub</button>
 						</div>

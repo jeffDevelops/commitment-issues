@@ -151,7 +151,7 @@ class Tracker extends Component {
 				this.setState({
 					interval: intervalsArray[index - 1],
 					tracking: false
-				})
+				});
 			}
 		}
 	}
