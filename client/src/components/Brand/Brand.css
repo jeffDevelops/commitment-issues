@@ -1,10 +1,33 @@
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;
+	height: 125px;
+	width: 100%;
+	background: #000;
+}
+
 .title_container {
-	margin: 0 auto 50px auto;
+	z-index: 1;
+	position: fixed;
+	top: 25px;
+	left: 0;
+	right: 0;
+	margin: auto;
 	max-width: 225px;
+	width: 70%;
+	height: 100px;
+}
+
+.nav_logo {
+	color: #fff;
 }
 
 h1, h4 {
 	margin: 0;
+	color: #000;
 }
 
 h1 {

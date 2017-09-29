@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import * as firebase from 'firebase';
 import * as axios from 'axios';
 import './Tracker.css';
+import Brand from '../Brand/Brand.jsx';
 
 import successSound from '../../media/success.mp3';
 import reminderSound from '../../media/reminder.mp3';
@@ -180,7 +181,7 @@ class Tracker extends Component {
 					}
 				});
 				console.log('DEMO ran');
-			}, 15000);
+			}, 6000);
 			this.setState({
 				demoInterval: demoInterval,
 				tracking: true
@@ -284,7 +285,8 @@ class Tracker extends Component {
 		}
 
 		return (
-			<div>
+			<div className="tracker_component">
+				<Brand className="brand"/>
 
 				{/* RESULTS */}
 
@@ -306,8 +308,8 @@ class Tracker extends Component {
 
 				<Link to='/' className="back_button"><i className="material-icons back">chevron_left</i></Link>
 				<h3 className="repo">You are tracking the <b>{this.state.repo}</b> repository.</h3>
+				<h2 className="goal_heading">Goal Interval</h2>
 				<div className="tracker">
-					<h2>Goal Interval</h2>
 					<div className="interval_container">
 						{ this.state.unit === 'half-day' || this.state.unit === 'Try It!'
 							? <div>
@@ -339,18 +341,6 @@ class Tracker extends Component {
 
 					<h1 className="slash">/</h1>
 
-					{ !this.state.tracking
-						? <div className="track_button">
-								<button
-									onClick={this.runTimer}
-								><i className="material-icons logout">track_changes</i>Track Backups
-								</button>
-							</div>
-						: <div className="track_button tracking">
-								<i className="material-icons logout">track_changes</i><h4>Listening<br />For Backups</h4>
-							</div>
-					}
-
 					<div className="unit_container">
 						<button
 						onClick={ () => { this.changeUnit('increment') }}
@@ -370,17 +360,27 @@ class Tracker extends Component {
 						: null
 						}
 						{ this.state.unit === 'Try It!'
-						? <p className="unit_description">Every 15 seconds
+						? <p className="unit_description">Checks Every Minute
 							</p>
 						: null
 						}
 						<i className="material-icons arrow_buttons down unit_value_down">arrow_drop_down</i>
 						</button>
 					</div>
-				</div>
-				<div className="results">
+				</div> {/*TRACKER*/}
 
-				</div>
+				{ !this.state.tracking
+					? <div className="track_button">
+							<button
+								onClick={this.runTimer}
+							><i className="material-icons track">track_changes</i>Track Backups
+							</button>
+						</div>
+					: <div className="tracking">
+							<i className="material-icons track">track_changes</i><h4>Listening<br />For Backups</h4>
+						</div>
+				}
+
 			</div>
 		)
 	}

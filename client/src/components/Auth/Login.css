@@ -1,3 +1,21 @@
+.login_section {
+	height: auto;
+	width: 100%;
+	margin: 125px auto 25px auto;
+	padding: 25px 0;
+	background: #fff;
+}
+
+.login_prompt {
+	height: auto;
+	width: 90%;
+	position: absolute;
+	margin: auto;
+	top: 250px;
+	left: 0;
+	right: 0;
+}
+
 h3 {
 	font-weight: 400;
 }
@@ -46,9 +64,9 @@ button:hover i.devicon-github-plain.colored,
 button:hover i.material-icons.logout {
 	color: #fff;
 	transition: color .6s;
-}	
+}
 
-button:focus, 
+button:focus,
 button:active {
 	outline: none;
 }
@@ -72,15 +90,29 @@ button i.material-icons.logout {
 	transition: color .6s;
 }
 
-.repos_section {
-	margin: 75px auto 0 auto;
+.repo_section_title {
+	margin: auto;
+	padding: 15px 0 25px 0;
+	background: #fff;
+	border-bottom: 1px solid #000;
 	width: 100%;
+	max-width: 500px;
+}
+
+.repos_section {
+	z-index: -1;
+	top: 250px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	width: 100%;
+	height: 100%;
 }
 
 ul {
 	width: 100%;
 	max-width: 500px;
-	margin: 50px auto;
+	margin: 0 auto;
 	padding: 0;
 	list-style: none;
 }
@@ -100,7 +132,7 @@ ul li {
 	padding: 5% 0;
 	width: 100%;
 	height: 120px;
-	border-top: 1px solid #000;
+	border-bottom: 1px solid #000;
 	transition: all .2s ease;
 }
 
@@ -137,4 +169,3 @@ ul li img {
 	border: 1px solid transparent;
 	transition: transform .3s ease;
 }
-
